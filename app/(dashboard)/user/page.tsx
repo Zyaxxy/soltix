@@ -255,7 +255,17 @@ export default function UserDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
         >
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="liquid-glass-strong rounded-pill flex items-center gap-2 px-3 py-1.5">
+                <input
+                  type="search"
+                  placeholder="Search"
+                  className="w-50 h-7 liquid-glass text-italic text-sm py-2 text-white/90 placeholder:text-white/45 placeholder:text-semibold focus:outline-none"
+                  aria-label="Search events"
+                />
+              </div>
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="liquid-glass rounded-pill flex items-center gap-1 px-1.5 py-1">
                 {navLinks.map((link) => (

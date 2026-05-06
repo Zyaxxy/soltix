@@ -74,16 +74,18 @@ export default function HeroContent() {
         >
             <header className="hidden md:block fixed top-0 left-0 z-[200] w-full px-10 py-4">
                 <nav className="mx-auto flex max-w-[1260px] items-center justify-between">
-                    <div className="liquid-glass rounded-pill flex items-center gap-3 px-2 py-1.5">
-                        {NAV_LINKS.map((item) => (
-                            <a
-                                key={item}
-                                href="#"
-                                className="text-sm font-medium px-2.5 py-1.5 rounded-full text-white/85 text-shadow-soft transition hover:text-white rounded-pill"
-                            >
-                                {item}
-                            </a>
-                        ))}
+                    <div className="flex items-center gap-4">
+                        <div className="liquid-glass rounded-pill flex items-center gap-3 px-2 py-1.5">
+                            {NAV_LINKS.map((item) => (
+                                <a
+                                    key={item}
+                                    href="#"
+                                    className="text-sm font-medium px-2.5 py-1.5 rounded-full text-white/85 text-shadow-soft transition hover:text-white rounded-pill"
+                                >
+                                    {item}
+                                </a>
+                            ))}
+                        </div>
                     </div>
                     <Link
                         href="/login/organizer"
@@ -97,9 +99,19 @@ export default function HeroContent() {
 
             <header className="md:hidden fixed top-0 left-0 z-[200] w-full px-4 pt-4">
                 <div className="liquid-glass rounded-pill flex items-center justify-between gap-3 px-3 py-2">
-                    <span className="font-display italic text-sm leading-none tracking-tight text-white text-shadow-soft select-none">
-                        BlockTix
-                    </span>
+                    <Link
+                        href="/"
+                        className="inline-flex items-center gap-2 text-white/95"
+                    >
+                        <img
+                            src="/icon.svg"
+                            alt="BlockTix logo"
+                            className="h-6 w-6"
+                        />
+                        <span className="font-display italic text-sm leading-none tracking-tight text-shadow-soft select-none">
+                            BlockTix
+                        </span>
+                    </Link>
                     <MenuToggle open={menuOpen} onClick={() => setMenuOpen((v) => !v)} />
                 </div>
             </header>
