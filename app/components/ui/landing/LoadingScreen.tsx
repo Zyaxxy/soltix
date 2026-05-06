@@ -85,7 +85,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
         playsInline
         preload="metadata"
       >
-        <source src="/bg.mp4" type="video/mp4" />
+        <source src="/bg1.mp4" type="video/mp4" />
       </video>
 
       <div className="absolute inset-0 bg-black/55" />

@@ -1,36 +1,38 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     useDynamicContext,
     useIsLoggedIn
 } from "@dynamic-labs/sdk-react-core";
 import { useRouter } from "next/navigation";
-import { fetchUserTicketSales, type UserTicketSale } from "@/lib/events";
+import { fetchUserTicketSales, fetchEventById, type UserTicketSale, type OrganizerEvent } from "@/lib/events";
 import { formatSol } from "@/lib/shared/format";
 import {
     Ticket,
     QrCode,
-    X,
     Calendar,
     MapPin,
     ArrowLeft,
     ChevronRight,
+    X,
     Info,
     CheckCircle2
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
+import { CardSpotlight } from "@/components/ui/card-spotlight";
 
 export default function MyTicketsPage() {
     const { user, primaryWallet } = useDynamicContext();
     const isLoggedIn = useIsLoggedIn();
     const router = useRouter();
 
-    const [tickets, setTickets] = useState<UserTicketSale[]>([]);
+    const [tickets, setTickets] = useState<(UserTicketSale & { event?: OrganizerEvent })[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedTicket, setSelectedTicket] = useState<UserTicketSale | null>(null);
+    const [selectedTicket, setSelectedTicket] = useState<(UserTicketSale & { event?: OrganizerEvent }) | null>(null);
+    const [isQrFlipped, setIsQrFlipped] = useState(false);
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -44,7 +46,13 @@ export default function MyTicketsPage() {
 
             try {
                 const sales = await fetchUserTicketSales(walletAddress);
-                setTickets(sales);
+                const ticketsWithEvents = await Promise.all(
+                    sales.map(async (ticket) => {
+                        const event = ticket.eventId ? await fetchEventById(ticket.eventId) : null;
+                        return { ...ticket, event: event ?? undefined };
+                    })
+                );
+                setTickets(ticketsWithEvents);
             } catch (error) {
                 console.error("Failed to fetch tickets:", error);
             } finally {
@@ -138,49 +146,65 @@ export default function MyTicketsPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                                whileHover={{ y: -4 }}
-                                onClick={() => setSelectedTicket(ticket)}
-                                className="group relative cursor-pointer"
+                                onClick={() => {
+                                    setSelectedTicket(ticket);
+                                    setIsQrFlipped(false);
+                                }}
+                                className="relative cursor-pointer rounded-[2.5rem] hover:bg-gradient-to-b hover:from-emerald-500/[0.08] hover:to-transparent transition-colors p-[1px] text-left"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem] blur-xl" />
-
-                                <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0c0f16] p-6 transition-all group-hover:border-white/20">
-                                    <div className="flex gap-5">
-                                        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <Ticket className="h-8 w-8 text-white/20" />
+                                <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0c0f16]">
+                                    {/* Event Banner */}
+                                    <div className="relative h-40 w-full overflow-hidden">
+                                        {ticket.event?.imageUrl ? (
+                                            <img
+                                                src={ticket.event.imageUrl}
+                                                alt={ticket.eventName || "Event"}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="h-full w-full bg-gradient-to-br from-emerald-500/30 via-teal-500/20 to-amber-500/20 flex items-center justify-center">
+                                                <Ticket className="h-16 w-16 text-white/20" />
                                             </div>
-                                            {/* We'd normally use ticket metadata imageUrl here */}
-                                        </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0f16] via-transparent to-transparent" />
 
-                                        <div className="flex flex-col justify-between py-1">
-                                            <div>
-                                                <h3 className="text-xl font-bold line-clamp-1">{ticket.eventName}</h3>
-                                                <div className="mt-2 flex items-center gap-4 text-sm text-white/50">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <Calendar className="h-3.5 w-3.5" />
-                                                        <span>{new Date(ticket.mintedAt).toLocaleDateString()}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-2">
-                                                <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">
-                                                    Verified Ticket
-                                                </span>
-                                            </div>
+                                        {/* Status Badge */}
+                                        <div className="absolute top-4 right-4">
+                                            <span className="rounded-full bg-emerald-500/20 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+                                                Verified
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <div className="mt-6 flex items-center justify-between pt-6 border-t border-white/5">
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] uppercase tracking-widest text-white/30 font-bold">Ticket ID</span>
-                                            <span className="text-sm font-mono text-white/70">
-                                                {ticket.ticketMint.slice(0, 10)}...{ticket.ticketMint.slice(-8)}
-                                            </span>
+                                    {/* Ticket Details */}
+                                    <div className="p-6 pt-4">
+                                        <h3 className="text-xl font-bold line-clamp-1 mb-3">{ticket.eventName}</h3>
+
+                                        <div className="flex items-center gap-4 text-sm text-white/50 mb-4">
+                                            {ticket.event?.eventDate && (
+                                                <div className="flex items-center gap-1.5">
+                                                    <Calendar className="h-3.5 w-3.5" />
+                                                    <span>{new Date(ticket.event.eventDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
+                                                </div>
+                                            )}
+                                            {ticket.event?.venue && (
+                                                <div className="flex items-center gap-1.5">
+                                                    <MapPin className="h-3.5 w-3.5" />
+                                                    <span className="line-clamp-1">{ticket.event.venue}</span>
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
-                                            <QrCode className="h-5 w-5 text-white/40 group-hover:text-white transition-colors" />
+
+                                        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] uppercase tracking-widest text-white/30 font-bold">Ticket ID</span>
+                                                <span className="text-sm font-mono text-white/70">
+                                                    {ticket.ticketMint.slice(0, 8)}...{ticket.ticketMint.slice(-6)}
+                                                </span>
+                                            </div>
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5">
+                                                <QrCode className="h-5 w-5 text-white/40" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -189,8 +213,6 @@ export default function MyTicketsPage() {
                     </div>
                 )}
             </main>
-
-            {/* QR Modal */}
             <AnimatePresence>
                 {selectedTicket && (
                     <>
@@ -199,7 +221,7 @@ export default function MyTicketsPage() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setSelectedTicket(null)}
-                            className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm"
+                            className="fixed inset-0 z-40 bg-black/90"
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -207,59 +229,116 @@ export default function MyTicketsPage() {
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                             className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
                         >
-                            <div className="relative w-full max-w-sm rounded-[3rem] bg-[#0c0f16] border border-white/10 p-8 shadow-2xl pointer-events-auto overflow-hidden">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500" />
-
+                            <CardSpotlight className="relative w-full max-w-md rounded-[3rem] border border-white/10 bg-[#0c0f16] p-0 shadow-2xl pointer-events-auto overflow-hidden">
                                 <button
                                     onClick={() => setSelectedTicket(null)}
-                                    className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-all"
+                                    className="absolute top-6 right-6 z-30 h-10 w-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-all"
                                 >
                                     <X className="h-5 w-5" />
                                 </button>
 
-                                <div className="text-center mb-8">
-                                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-                                        <CheckCircle2 className="h-8 w-8 text-emerald-400" />
-                                    </div>
-                                    <h2 className="text-2xl font-bold mb-1">{selectedTicket.eventName}</h2>
-                                    <p className="text-white/50 text-sm">Valid Admission Ticket</p>
-                                </div>
+                                <div className="relative min-h-[520px] w-full [perspective:1400px]">
+                                    <div
+                                        className={
+                                            "relative h-full w-full transition-transform duration-700 [transform-style:preserve-3d] " +
+                                            (isQrFlipped ? "[transform:rotateY(180deg)]" : "")
+                                        }
+                                    >
+                                        <div className="absolute inset-0 [backface-visibility:hidden]">
+                                            <div className="relative overflow-hidden">
+                                                <div className="relative h-44 w-full overflow-hidden">
+                                                    {selectedTicket.event?.imageUrl ? (
+                                                        <img
+                                                            src={selectedTicket.event.imageUrl}
+                                                            alt={selectedTicket.eventName || "Event"}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="h-full w-full bg-gradient-to-br from-emerald-500/30 via-teal-500/20 to-amber-500/20 flex items-center justify-center">
+                                                            <Ticket className="h-16 w-16 text-white/20" />
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0c0f16] via-transparent to-transparent" />
 
-                                <div className="relative aspect-square w-full rounded-2xl bg-white p-6 shadow-xl mb-8">
-                                    <QRCodeSVG
-                                        value={qrData}
-                                        size={200}
-                                        level="H"
-                                        includeMargin={false}
-                                        className="w-full h-full"
-                                    />
-                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                        <div className="bg-white p-1 rounded-lg">
-                                            <div className="bg-emerald-500 h-8 w-8 rounded flex items-center justify-center">
-                                                <Ticket className="h-5 w-5 text-white" />
+                                                    <div className="absolute top-4 right-4">
+                                                        <span className="rounded-full bg-emerald-500/20 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+                                                            Verified
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-8">
+                                                    <div className="text-center mb-8">
+                                                        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
+                                                            <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+                                                        </div>
+                                                        <h2 className="text-2xl font-bold mb-1">{selectedTicket.eventName}</h2>
+                                                        <p className="text-white/50 text-sm">Valid Admission Ticket</p>
+                                                    </div>
+
+                                                    <div className="space-y-4">
+                                                        <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
+                                                            <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/5">
+                                                                <Info className="h-5 w-5 text-white/40" />
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[10px] uppercase tracking-widest text-white/30 font-bold">Verification Data</span>
+                                                                <span className="text-xs font-mono text-white/60">
+                                                                    HASH: {selectedTicket.ticketMint.slice(0, 16)}...
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setIsQrFlipped(true)}
+                                                            className="w-full rounded-full bg-white text-black px-6 py-3 font-semibold hover:bg-white/90 transition-all"
+                                                        >
+                                                            Show QR
+                                                        </button>
+
+                                                        <p className="text-[10px] text-center text-white/30 uppercase tracking-[0.2em] font-medium py-2">
+                                                            Secured by SOLTix Protocol
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                                            <div className="absolute inset-0 z-0 bg-gradient-to-br from-emerald-500/20 via-transparent to-indigo-500/20" />
+                                            <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.2),transparent_55%),radial-gradient(circle_at_80%_0%,rgba(59,130,246,0.18),transparent_45%)]" />
+
+                                            <div className="absolute inset-0 z-10 flex items-center justify-center pt-70">
+                                                <div className="rounded-3xl bg-white p-5 shadow-[0_0_40px_rgba(59,130,246,0.35)]">
+                                                    <QRCodeSVG
+                                                        value={qrData || selectedTicket.ticketMint}
+                                                        size={260}
+                                                        level="H"
+                                                        
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="relative z-20 flex h-full flex-col items-center justify-between p-8">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsQrFlipped(false)}
+                                                    className="flex items-center gap-2 rounded-full bg-black/40 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/60"
+                                                >
+                                                    Back
+                                                </button>
+                                                <div className="text-center">
+                                                    <p className="text-sm text-white/70">Scan for entry</p>
+                                                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-2">
+                                                        SOLTix Verified
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                                        <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/5">
-                                            <Info className="h-5 w-5 text-white/40" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] uppercase tracking-widest text-white/30 font-bold">Verification Data</span>
-                                            <span className="text-xs font-mono text-white/60">
-                                                HASH: {selectedTicket.ticketMint.slice(0, 16)}...
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <p className="text-[10px] text-center text-white/30 uppercase tracking-[0.2em] font-medium py-2">
-                                        Secured by SOLTix Protocol
-                                    </p>
-                                </div>
-                            </div>
+                            </CardSpotlight>
                         </motion.div>
                     </>
                 )}
