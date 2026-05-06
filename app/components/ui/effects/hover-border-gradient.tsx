@@ -6,23 +6,29 @@ import { cn } from "@/lib/utils";
 
 type Direction = "TOP" | "LEFT" | "BOTTOM" | "RIGHT";
 
-export function HoverBorderGradient({
+type HoverBorderGradientOwnProps = {
+  containerClassName?: string;
+  className?: string;
+  duration?: number;
+  clockwise?: boolean;
+  children?: React.ReactNode;
+};
+
+type HoverBorderGradientProps<T extends React.ElementType> =
+  HoverBorderGradientOwnProps & {
+    as?: T;
+  } & Omit<React.ComponentPropsWithoutRef<T>, keyof HoverBorderGradientOwnProps | "as">;
+
+export function HoverBorderGradient<T extends React.ElementType = "button">({
   children,
   containerClassName,
   className,
-  as: Tag = "button",
+  as,
   duration = 1,
   clockwise = true,
   ...props
-}: React.PropsWithChildren<
-  {
-    as?: React.ElementType;
-    containerClassName?: string;
-    className?: string;
-    duration?: number;
-    clockwise?: boolean;
-  } & React.HTMLAttributes<HTMLElement> & { href?: string }
->) {
+}: HoverBorderGradientProps<T>) {
+  const Tag = (as ?? "button") as React.ElementType;
   const [hovered, setHovered] = useState<boolean>(false);
   const [direction, setDirection] = useState<Direction>("TOP");
 
@@ -54,40 +60,37 @@ export function HoverBorderGradient({
       return () => clearInterval(interval);
     }
   }, [hovered, duration]);
-  return (
-    <Tag
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={cn(
+
+  return React.createElement(
+    Tag as React.ElementType<React.PropsWithChildren<Record<string, unknown>>>,
+    {
+      onMouseEnter: () => setHovered(true),
+      onMouseLeave: () => setHovered(false),
+      className: cn(
         "relative flex rounded-full border border-white/10 content-center bg-black/20 hover:bg-black/10 transition duration-500 items-center flex-col flex-nowrap gap-10 h-min justify-center overflow-hidden p-[3px] decoration-clone w-fit",
         containerClassName
+      ),
+      ...props,
+    },
+    <div
+      className={cn(
+        "w-auto text-white z-10 bg-black/95 px-4 py-2 rounded-[inherit]",
+        className
       )}
-      {...props}
     >
-      <div
-        className={cn(
-          "w-auto text-white z-10 bg-black/95 px-4 py-2 rounded-[inherit]",
-          className
-        )}
-      >
-        {children}
-      </div>
-      <motion.div
-        className={cn(
-          "flex-none inset-0 overflow-hidden absolute z-0 rounded-[inherit]"
-        )}
-        style={{
-          filter: "blur(1px)",
-        }}
-        initial={{ background: movingMap[direction] }}
-        animate={{
-          background: hovered
-            ? [movingMap[direction], highlight]
-            : movingMap[direction],
-        }}
-        transition={{ ease: "linear", duration: duration ?? 1 }}
-      />
-      <div className="absolute z-1 flex-none inset-[2px] rounded-[100px]" />
-    </Tag>
+      {children}
+    </div>,
+    <motion.div
+      className={cn("flex-none inset-0 overflow-hidden absolute z-0 rounded-[inherit]")}
+      style={{
+        filter: "blur(1px)",
+      }}
+      initial={{ background: movingMap[direction] }}
+      animate={{
+        background: hovered ? [movingMap[direction], highlight] : movingMap[direction],
+      }}
+      transition={{ ease: "linear", duration: duration ?? 1 }}
+    />,
+    <div className="absolute z-1 flex-none inset-[2px] rounded-[100px]" />
   );
 }
