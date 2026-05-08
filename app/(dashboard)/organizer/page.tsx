@@ -365,8 +365,7 @@ export default function OrganizerDashboard() {
                                 <Ticket className="h-4 w-4 text-white/40" />
                                 {event.mintedCount.toLocaleString()} / {event.totalSupply.toLocaleString()} sold
                               </span>
-                              <span className="inline-flex items-center gap-1.5">
-                                <DollarSign className="h-4 w-4 text-white/40" />
+                              <span className="inline-flex items-center">
                                 {formatSol(event.priceLamports)}
                               </span>
                             </div>
