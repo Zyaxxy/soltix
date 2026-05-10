@@ -20,7 +20,7 @@ const PHONE_CREDENTIAL_FORMAT = "phoneNumber";
 const BLOCKCHAIN_CREDENTIAL_FORMAT = "blockchain";
 const SOL_CHAIN = "SOL";
 const FALLBACK_EVENT_IMAGE =
-  "https://dummyimage.com/1200x630/0b0f14/ffffff&text=BlockTix";
+  "https://dummyimage.com/1200x630/0b0f14/ffffff&text=Soltix";
 
 const formatEventDate = (value: string | null) => {
   if (!value) return "Date TBA";

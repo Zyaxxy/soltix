@@ -322,7 +322,7 @@ export default function OrganizerDashboard() {
                     const progress = event.totalSupply > 0
                       ? Math.round((event.mintedCount / event.totalSupply) * 100)
                       : 0;
-                    const eventBanner = event.imageUrl || "https://dummyimage.com/1200x630/0b0f14/ffffff&text=BlockTix";
+                    const eventBanner = event.imageUrl || "https://dummyimage.com/1200x630/0b0f14/ffffff&text=Soltix";
 
                     return (
                       <motion.article

@@ -3,8 +3,8 @@ import { EVENTS_TABLE } from "@/lib/events";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const FALLBACK_EVENT_IMAGE =
-  "https://dummyimage.com/1200x630/0b0f14/ffffff&text=BlockTix";
-const FALLBACK_EXTERNAL_URL = "https://blocktix.app";
+  "https://dummyimage.com/1200x630/0b0f14/ffffff&text=Soltix";
+const FALLBACK_EXTERNAL_URL = "https://soltix.vercel.app/";
 
 export async function GET(
   request: Request,
@@ -37,7 +37,7 @@ export async function GET(
     name: `${eventRow.name} Ticket`,
     symbol: "BTIX",
     description:
-      eventRow.description?.trim() || `${eventRow.name} entry ticket minted on BlockTix.`,
+      eventRow.description?.trim() || `${eventRow.name} entry ticket minted on Soltix.`,
     image: imageUrl,
     external_url: requestOrigin || FALLBACK_EXTERNAL_URL,
     attributes: [

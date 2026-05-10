@@ -99,7 +99,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
       >
-        <img src="/icon.svg" alt="BlockTix logo" className="h-8 w-8" />
+        <img src="/icon.svg" alt="Soltix logo" className="h-8 w-8" />
       </motion.div>
 
       <div className="absolute inset-0 flex items-center justify-center">

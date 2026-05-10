@@ -87,7 +87,7 @@ export default function AuthPageShell({
                   <aside className="liquid-glass hidden flex-col justify-between rounded-3xl p-5 lg:flex lg:p-6">
                     <div>
                       <h1 className="font-display italic text-4xl tracking-tight text-white text-shadow-soft xl:text-5xl">
-                        BlockTix
+                        SolTix
                       </h1>
                       <p className="mt-2 text-sm font-light text-white/65">{sidebarTitle}</p>
                     </div>

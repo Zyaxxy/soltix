@@ -7,7 +7,7 @@ export default function OrganizerLoginPage() {
       redirectPath="/organizer"
       sidebarTitle="Organizer access, on-chain"
       sidebarSubtitle="Connect to create, manage, and launch on-chain events with verifiable tickets."
-      mobileTitle="BlockTix"
+      mobileTitle="Soltix Organizer"
       mobileSubtitle="Organizer access, on-chain"
     />
   );

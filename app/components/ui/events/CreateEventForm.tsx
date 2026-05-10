@@ -18,7 +18,7 @@ import {
 import { ImageUpload } from "../shared/ImageUpload";
 
 const FALLBACK_IMAGE_URI =
-  "https://dummyimage.com/1200x630/0b0f14/ffffff&text=BlockTix";
+  "https://dummyimage.com/1200x630/0b0f14/ffffff&text=Soltix";
 
 type CreateEventFormProps = {
   open: boolean;
@@ -175,14 +175,14 @@ export function CreateEventForm({
           name: `${name} Ticket`,
           symbol,
           description:
-            description.trim() || `${name} entry ticket minted on BlockTix.`,
+            description.trim() || `${name} entry ticket minted on Soltix.`,
           // Use the Supabase public URL if one was uploaded, otherwise fall back
           // to a deterministic placeholder so the metadata is always valid.
           imageUri: imageUrl.trim() || FALLBACK_IMAGE_URI,
           externalUrl:
             typeof window !== "undefined"
               ? window.location.origin
-              : "https://blocktix.app",
+              : "https://soltix.vercel.app/",
           attributes: [
             { trait_type: "Event", value: name },
             { trait_type: "Venue", value: venue.trim() || "TBA" },

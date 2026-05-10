@@ -109,7 +109,7 @@ export default function HeroContent() {
                             className="h-6 w-6"
                         />
                         <span className="font-display italic text-sm leading-none tracking-tight text-shadow-soft select-none">
-                            BlockTix
+                            SolTix
                         </span>
                     </Link>
                     <MenuToggle open={menuOpen} onClick={() => setMenuOpen((v) => !v)} />

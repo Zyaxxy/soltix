@@ -6,7 +6,7 @@ import {
 import { SolanaWalletConnectors } from "@dynamic-labs/solana";
 import { ReactNode, useEffect } from "react";
 
-const DYNAMIC_ENV_CACHE_KEY = "blocktix.dynamic.environment.id";
+const DYNAMIC_ENV_CACHE_KEY = "soltix.dynamic.environment.id";
 
 const clearDynamicStorage = () => {
   const shouldClear = (key: string) => key.toLowerCase().includes("dynamic");

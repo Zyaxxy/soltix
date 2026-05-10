@@ -16,7 +16,7 @@ import { fetchUserProfile } from "@/lib/profile";
 import { formatSol } from "@/lib/shared/format";
 
 const FALLBACK_EVENT_IMAGE =
-  "https://dummyimage.com/1200x630/0b0f14/ffffff&text=BlockTix";
+  "https://dummyimage.com/1200x630/0b0f14/ffffff&text=Soltix";
 
 const statusLabel: Record<OrganizerEvent["status"], string> = {
   draft: "Draft",

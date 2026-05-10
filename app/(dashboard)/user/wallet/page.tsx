@@ -196,7 +196,7 @@ export default function WalletPage() {
                 Back
               </Link>
               <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-white/50">BlockTix Wallet</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-white/50">Soltix Wallet</p>
                 <h1 className="mt-1 text-3xl font-semibold">My Wallet</h1>
               </div>
             </div>
