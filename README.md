@@ -7,14 +7,14 @@ By employing a pragmatic, high-performance hybrid architecture, Soltix couples o
 
 ---
 
-## 📄 Research Paper & Academic Context
+##  Research Paper & Academic Context
 This project was submitted in May 2026 in partial fulfillment of the requirements for the award of the degree of **Bachelor of Technology (B.Tech) in Computer Science and Engineering** at **Sister Nivedita University, Newtown Kolkata**[cite: 1].
 
 * **Full Research Paper**: **[Read the Soltix Thesis Paper](https://drive.google.com/file/d/1yJfljnzlxbvw-MZYv_nsMbJWXs-GCX-f/view?usp=sharing)**[cite: 1]
 
 ---
 
-## 🚀 Key Features
+##  Key Features
 
 * **True Digital Ownership (NFTs)**: Tickets are uniquely tokenized as Solana NFTs using standard verified collections, mitigating forgery and granting buyers a transferable digital asset.
 * **Permanent Metadata Storage**: Ticket assets, seat data, and event details are permanently and immutably anchored to **Arweave** via the **Irys** network, eliminating reliance on vulnerable, centralized file hosts.
@@ -24,7 +24,7 @@ This project was submitted in May 2026 in partial fulfillment of the requirement
 
 ---
 
-## 🛠 System Architecture & Stack
+## System Architecture & Stack
 
 Soltix avoids the pitfalls of purely on-chain execution (high gas/latency) and fully centralized systems (opacity/scalping) through a modular hybrid design:
 
@@ -44,13 +44,13 @@ The system strictly decouples transactions into distinct operational flows:
 
 ---
 
-## 📦 Core Configuration Data
+##  Core Configuration Data
 
 Primary ticket minting properties and structural parameters map directly into standardized configurations. Standard asset profiles are managed dynamically via high-level SDK tools like **Codama**, ensuring type-safe serialization and deserialization across the Rust (Anchor) and TypeScript codebases.
 
 ---
 
-## 📊 Evaluation & Performance Metrics
+## Evaluation & Performance Metrics
 As detailed in Chapter 5, empirical results indicate that Soltix scales effectively against traditional Web3 architectures:
 * **Sub-second Response Latency**: Offloading transient operational variables to Supabase enables near-instant updates.
 * **Economic Efficiency**: Custom Anchor auction vaults ensure users only settle on-chain during definitive ownership state changes, eliminating network fees for losing bids.
